@@ -10,6 +10,7 @@ The agent consists of several key components:
 - **AgentEntrypoint & AgentInitializer**: Bootstrap and configure the agent at JVM startup.
 - **AgentStarter & AgentStarterImpl**: Manage the lifecycle and instrumentation logic.
 - **PerformanceTracer & TimerContext**: Collect and aggregate timing data for instrumented methods.
+- **Instrumentation via ByteBuddy**: The agent uses ByteBuddy to dynamically instrument classes and methods at runtime, enabling precise and flexible performance tracing without modifying application code.
 - **ManagementHttpServer**: Embedded HTTP server exposing REST APIs and a web interface for trace management and visualization.
 - **Handlers (GetTrace, GetTraces, DeleteTrace, StopTrace, etc.)**: REST endpoints for trace operations (start, stop, list, download, delete).
 - **StaticResourceHandler**: Serves the web UI (HTML, CSS, JS) for interactive trace exploration.
@@ -52,3 +53,11 @@ The agent consists of several key components:
 
 ## License & Contributions
 Open source project – contributions and feedback are welcome!
+
+## Third-party libraries
+
+This project uses [ByteBuddy](https://bytebuddy.net/) for runtime instrumentation of Java classes and methods.
+
+ByteBuddy is licensed under the Apache License, Version 2.0. You can find the full license text at: https://www.apache.org/licenses/LICENSE-2.0
+
+By using ByteBuddy, this project complies with the terms of the Apache License 2.0, including attribution and license notice.
