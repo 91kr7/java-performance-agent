@@ -1,45 +1,54 @@
-~~~ bash
+# Java Performance Agent – Introduction
 
-#TEST TomCat10 Jdk17
+## Overview
 
-#!/bin/bash
+Java Performance Agent is a lightweight, pluggable Java agent designed to monitor, trace, and analyze the performance of Java applications in real time. It provides developers and operators with actionable insights into method execution times, call stacks, and resource usage, helping to identify bottlenecks and optimize application performance.
 
-export MSYS_NO_PATHCONV=1
+## Architecture
 
-JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport -javaagent:/usr/local/tomcat/performance-agent.jar -Dcmdev.profiler.filters.path=/usr/local/tomcat/filters.properties"
-mvn -q clean install
-rootDir=$PWD
-pushd test-app
-mvn -q clean install
-docker build -t test-app-tomcat -f Dockerfile-Tomcat9jdk17 .
-docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
-    -e JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS}" \
-    -v $rootDir/test-app/filters.properties:/usr/local/tomcat/filters.properties \
-    -v $rootDir/target/performance-agent.jar:/usr/local/tomcat/performance-agent.jar \
-    -v $rootDir/test-app/traces:/tmp/traces \
-    test-app-tomcat
-popd
-~~~
+The agent consists of several key components:
+- **AgentEntrypoint & AgentInitializer**: Bootstrap and configure the agent at JVM startup.
+- **AgentStarter & AgentStarterImpl**: Manage the lifecycle and instrumentation logic.
+- **PerformanceTracer & TimerContext**: Collect and aggregate timing data for instrumented methods.
+- **ManagementHttpServer**: Embedded HTTP server exposing REST APIs and a web interface for trace management and visualization.
+- **Handlers (GetTrace, GetTraces, DeleteTrace, StopTrace, etc.)**: REST endpoints for trace operations (start, stop, list, download, delete).
+- **StaticResourceHandler**: Serves the web UI (HTML, CSS, JS) for interactive trace exploration.
+- **File Writers & Utilities**: Serialize, compress, and store trace data efficiently.
 
-~~~ bash
+## How It Works
 
-#TEST Wildfly Latest
+1. **Startup**: The agent is attached to the JVM (via `-javaagent`), initializing its configuration and HTTP server.
+2. **Instrumentation**: Classes and methods are instrumented based on filters and configuration, enabling precise timing and call tracking.
+3. **Trace Collection**: When a trace is started (via API or UI), the agent records method execution data and call stacks.
+4. **Trace Management**: Traces can be listed, downloaded, deleted, or stopped via REST API or the web interface.
+5. **Analysis**: Collected traces are available for download and analysis, helping to pinpoint performance issues.
 
-#!/bin/bash
+## Usage & Integration
 
-export MSYS_NO_PATHCONV=1
+- **Attach to JVM**: Add the agent JAR to your JVM startup parameters:
+  ```sh
+  -javaagent:/path/to/performance-agent.jar
+  ```
+- **Configure Filters**: Use `filters.properties` to specify which classes/methods to instrument.
+- **Access Web UI**: Open the embedded HTTP server (default port 8090) to interact with traces and view results.
+- **API Endpoints**: The REST endpoints are primarily called by the web UI for trace management and visualization, but are also available for automation and integration with CI/CD or monitoring tools.
 
-JAVA_TOOL_OPTIONS=" -javaagent:/opt/jboss/wildfly/performance-agent.jar  -Dcmdev.profiler.filters.path=/opt/jboss/wildfly/filters.properties"
-mvn -q clean install
-rootDir=$PWD
-pushd test-app
-mvn -q clean install
-docker build -t test-app-wildfly -f Dockerfile-Wildfly .
-docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
-    -e JAVA_OPTS="${JAVA_TOOL_OPTIONS}" \
-    -v $rootDir/test-app/filters.properties:/opt/jboss/wildfly/filters.properties \
-    -v $rootDir/target/performance-agent.jar:/opt/jboss/wildfly/performance-agent.jar \
-    -v $rootDir/test-app/traces:/tmp/traces \
-    test-app-wildfly
-popd
-~~~
+## Example REST Endpoints
+- `GET /traces` – List available traces
+- `POST /trace/start` – Start a new trace
+- `POST /trace/stop` – Stop the current trace
+- `GET /trace/{id}` – Download a trace file
+- `DELETE /trace/{id}` – Delete a trace
+
+## Requirements
+- Java 17+ (compatible with modern JVMs)
+- Works with Tomcat, WildFly, and other servlet containers
+- No code changes required in the target application
+
+## Quick Start
+1. Build the agent and your target application.
+2. Start your application with the agent attached.
+3. Access the web UI or use the REST API to manage and analyze traces.
+
+## License & Contributions
+Open source project – contributions and feedback are welcome!
