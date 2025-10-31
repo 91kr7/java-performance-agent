@@ -1,4 +1,7 @@
 ~~~ bash
+
+#TEST TomCat10 Jdk17
+
 #!/bin/bash
 
 export MSYS_NO_PATHCONV=1
@@ -15,5 +18,28 @@ docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
     -v $rootDir/target/performance-agent.jar:/usr/local/tomcat/performance-agent.jar \
     -v $rootDir/test-app/traces:/tmp/traces \
     test-app-tomcat
+popd
+~~~
+
+~~~ bash
+
+#TEST Wildfly Latest
+
+#!/bin/bash
+
+export MSYS_NO_PATHCONV=1
+
+JAVA_TOOL_OPTIONS=" -javaagent:/opt/jboss/wildfly/performance-agent.jar  -Dcmdev.profiler.filters.path=/opt/jboss/wildfly/filters.properties"
+mvn -q clean install
+rootDir=$PWD
+pushd test-app
+mvn -q clean install
+docker build -t test-app-wildfly -f Dockerfile-Wildfly .
+docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
+    -e JAVA_OPTS="${JAVA_TOOL_OPTIONS}" \
+    -v $rootDir/test-app/filters.properties:/opt/jboss/wildfly/filters.properties \
+    -v $rootDir/target/performance-agent.jar:/opt/jboss/wildfly/performance-agent.jar \
+    -v $rootDir/test-app/traces:/tmp/traces \
+    test-app-wildfly
 popd
 ~~~
