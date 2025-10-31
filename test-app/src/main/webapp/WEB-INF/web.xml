@@ -5,7 +5,7 @@
          version="4.0">
     <servlet>
         <servlet-name>ComputeServlet</servlet-name>
-        <servlet-class>com.poc.testapp.ComputeServlet</servlet-class>
+        <servlet-class>com.testapp.ComputeServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ComputeServlet</servlet-name>
