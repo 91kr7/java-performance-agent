@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+          content="Performance Trace Manager - Advanced tool for monitoring and analyzing Java application performance">
+    <meta name="keywords" content="performance, tracing, java, monitoring, debugging">
+    <meta name="author" content="Performance Monitoring Tools">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Performance Trace Manager">
+    <meta property="og:description" content="Tool to monitor and analyze application performance">
+    <meta property="og:type" content="website">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml"
+          href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23009688' d='M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z'/%3E%3C/svg%3E">
+
+    <title>Performance Trace Manager</title>
+    <link rel="stylesheet" type="text/css" href="/statics/main.css">
+    <script src="/statics/main.js"></script>
+
+</head>
+
+<body>
+<div class="container">
+    <header>
+        <h1>🔍 Performance Trace Manager</h1>
+    </header>
+
+    <!-- Enhanced Loading Spinner -->
+    <div id="loadingSpinner" aria-hidden="true" aria-label="Loading">
+        <div class="spinner-container">
+            <svg width="60" height="60" viewBox="0 0 50 50" aria-hidden="true">
+                <circle cx="25" cy="25" r="20"/>
+            </svg>
+            <div class="spinner-text">Loading...</div>
+        </div>
+    </div>
+
+    <main class="tabs" role="main">
+        <nav class="tab-buttons" role="tablist" aria-label="Performance Traces Sections">
+            <button class="tab-button active"
+                    role="tab"
+                    aria-selected="true"
+                    aria-controls="tab-conf-setup"
+                    id="tab-conf-setup-btn">
+                ⚙️ Setup Traces
+            </button>
+            <button class="tab-button"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="tab-list"
+                    id="tab-list-btn">
+                📋 Trace List
+            </button>
+            <button class="tab-button"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="tab-stack"
+                    id="tab-stack-btn">
+                🌳 Stack Details
+            </button>
+            <button class="tab-button"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="tab-top-methods"
+                    id="tab-top-methods-btn">
+                📊 Top Methods
+            </button>
+        </nav>
+
+        <section id="tab-conf-setup"
+                 class="tab-content active"
+                 role="tabpanel"
+                 aria-labelledby="tab-conf-setup-btn">
+            <form id="configForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="enableTrace" class="checkbox-label">
+                        <input type="checkbox" id="enableTrace" disabled/>
+                        Tracing Status
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="expressionInput">Optional packages to exclude:</label>
+                    <input type="text"
+                           id="packagesFilter"
+                           placeholder="com.package1,com.package2..."/>
+                </div>
+
+                <div class="form-group">
+                    <label for="expressionInput">Expression to trace:</label>
+                    <input type="text"
+                           id="expressionInput"
+                           placeholder="e.g. com.example.*"/>
+                </div>
+
+                <div class="button-group" role="group" aria-label="Trace controls">
+                    <button type="button" class="start" onclick="startTrace()" aria-describedby="start-help">
+                        ▶️ Start Trace
+                    </button>
+                    <button type="button" class="stop" onclick="stopTrace()" aria-describedby="stop-help">
+                        ⏹️ Stop Trace
+                    </button>
+                </div>
+                <div class="sr-only">
+                    <div id="start-help">Start performance tracing</div>
+                    <div id="stop-help">Stop performance tracing</div>
+                </div>
+            </form>
+        </section>
+
+        <section id="tab-list"
+                 class="tab-content"
+                 role="tabpanel"
+                 aria-labelledby="tab-list-btn">
+            <div class="button-group">
+                <button type="button" class="fetch" onclick="TraceActions.fetchTraces()">
+                    🔄 Refresh List
+                </button>
+            </div>
+
+            <input type="text"
+                   id="search-bar"
+                   class="search-bar"
+                   placeholder="🔍 Filter traces..."
+                   onkeyup="filterTraces()"
+                   aria-label="Search field to filter traces">
+
+            <ul id="listTraces"
+                role="list"
+                aria-label="List of available traces"
+                tabindex="0"></ul>
+
+            <div id="errorMsg"
+                 role="alert"
+                 aria-live="polite"
+                 aria-atomic="true"></div>
+        </section>
+
+        <section id="tab-stack"
+                 class="tab-content"
+                 role="tabpanel"
+                 aria-labelledby="tab-stack-btn">
+            <div id="stackTreeContainer"
+                 role="tree"
+                 aria-label="Tree view of calls"
+                 tabindex="0"></div>
+        </section>
+
+        <section id="tab-top-methods"
+                 class="tab-content"
+                 role="tabpanel"
+                 aria-labelledby="tab-top-methods-btn">
+            <div id="topMethodsContainer"
+                 role="list"
+                 aria-label="List of methods sorted by execution time"
+                 tabindex="0"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
