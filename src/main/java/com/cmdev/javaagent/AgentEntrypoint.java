@@ -21,6 +21,7 @@ public final class AgentEntrypoint {
             Instrumentation inst, String agentArgs) {
         try {
             System.out.println("[CMDev] Starting CmDev Profiling Agent...");
+            setupApplicationServerSystemVariable();
             new ManagementHttpServer().run();
             File javaagentFile = installBootstrapJar(inst);
             AgentInitializer.initialize(inst, javaagentFile);
@@ -28,6 +29,12 @@ public final class AgentEntrypoint {
             // Do not rethrow. No log manager is available here, so just print to stderr.
             System.err.println("[CMDev] Failed to start CmDev Profiling Agent: " + ex.getMessage());
         }
+    }
+
+    private static void setupApplicationServerSystemVariable() {
+        // this variable tell to wildfly to load "com.cmdev.profiler" as a system module
+        // TODO niceToHave: automatically detect the application server to avoid setting unnecessary system variables
+        System.setProperty("jboss.modules.system.pkgs", "com.cmdev.profiler");
     }
 
     private static synchronized File installBootstrapJar(Instrumentation inst)

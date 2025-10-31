@@ -29,7 +29,7 @@ popd
 
 export MSYS_NO_PATHCONV=1
 
-JAVA_TOOL_OPTIONS=" -javaagent:/opt/jboss/wildfly/performance-agent.jar -D  -Dcmdev.profiler.filters.path=/opt/jboss/wildfly/filters.properties"
+JAVA_TOOL_OPTIONS=" -javaagent:/opt/jboss/wildfly/performance-agent.jar  -Dcmdev.profiler.filters.path=/opt/jboss/wildfly/filters.properties"
 mvn -q clean install
 rootDir=$PWD
 pushd test-app
