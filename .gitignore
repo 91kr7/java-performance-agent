@@ -38,6 +38,3 @@ build/
 .DS_Store
 
 test-app/traces
-
-filters.properties
-filters2.properties
