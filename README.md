@@ -84,7 +84,7 @@ popd
 ### Wildfly 28.0.0.Final-jdk17
 ```bash
 export MSYS_NO_PATHCONV=1
-JAVA_TOOL_OPTIONS=" -javaagent:/opt/jboss/wildfly/performance-agent.jar  -Dcmdev.profiler.filters.path=/opt/jboss/wildfly/filters.properties"
+JAVA_TOOL_OPTIONS=" -agentlib:jdwp=transport=dt_socket,server=y,address=*:8787,suspend=n -javaagent:/opt/jboss/wildfly/performance-agent.jar  -Dcmdev.profiler.filters.path=/opt/jboss/wildfly/filters.properties"
 mvn -q clean install
 rootDir=$PWD
 pushd test-app

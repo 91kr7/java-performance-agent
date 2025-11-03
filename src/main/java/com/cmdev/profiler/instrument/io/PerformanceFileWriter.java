@@ -8,7 +8,6 @@ import static com.cmdev.profiler.instrument.io.ZipUtils.gzipAndDeleteFile;
 
 public class PerformanceFileWriter {
 
-    private static final java.util.concurrent.ExecutorService zipExecutor = java.util.concurrent.Executors.newFixedThreadPool(2);
     private final BufferedWriter writer;
     private final String filePath;
 
@@ -35,12 +34,10 @@ public class PerformanceFileWriter {
             System.err.println("[CMDev] Error closing writer: " + e.getMessage());
             throw e;
         }
-        zipExecutor.submit(() -> {
-            try {
-                gzipAndDeleteFile(this.filePath);
-            } catch (Exception e) {
-                System.err.println("[CMDev] Error zipping file: " + e.getMessage());
-            }
-        });
+        try {
+            gzipAndDeleteFile(this.filePath);
+        } catch (Exception e) {
+            System.err.println("[CMDev] Error zipping file: " + e.getMessage());
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.cmdev.profiler.bootstrap;
 
 import com.cmdev.profiler.instrument.PerformanceTracer;
+import com.cmdev.profiler.instrument.daemon.TraceManagerDaemon;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.dynamic.ClassFileLocator;
@@ -21,6 +22,7 @@ public class AgentStarterImpl implements AgentStarter {
     public void start() {
 
         try {
+            new TraceManagerDaemon().start();
             new AgentBuilder.Default()
                     .type(ClassFilterUtils::isIncludedClass)
                     .transform((builder, typeDescription, classLoader, module, domain) -> {

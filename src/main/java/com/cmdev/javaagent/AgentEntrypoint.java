@@ -1,6 +1,7 @@
 package com.cmdev.javaagent;
 
 import com.cmdev.net.ManagementHttpServer;
+import com.cmdev.profiler.instrument.daemon.TraceManagerDaemon;
 
 import java.io.File;
 import java.io.IOException;

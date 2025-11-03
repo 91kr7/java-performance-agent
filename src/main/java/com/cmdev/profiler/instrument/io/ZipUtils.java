@@ -23,8 +23,6 @@ public class ZipUtils {
                 while ((length = fis.read(buffer)) > 0) {
                     gzos.write(buffer, 0, length);
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
             if (!fileToGzip.delete()) {
                 throw new IOException("Unable to delete original file: " + filePath);
