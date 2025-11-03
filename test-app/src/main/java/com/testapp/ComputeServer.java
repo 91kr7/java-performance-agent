@@ -1,10 +1,11 @@
 package com.testapp;
 
 import com.cmdev.profiler.instrument.TimerContext;
+import org.test.ValueVarchar;
 
 import java.sql.*;
 
-public class ComputeServer {
+public final class ComputeServer extends BaseComputeServer {
 
     public static void main(String[] args) throws Exception {
 
@@ -15,6 +16,7 @@ public class ComputeServer {
 
     public String run() {
 
+        ValueVarchar.EMPTY.hashCode();
         StringBuilder report = new StringBuilder();
         long start = System.nanoTime();
 
@@ -45,19 +47,6 @@ public class ComputeServer {
         try (Statement st = conn.createStatement()) {
             st.execute("DROP TABLE IF EXISTS " + tableName);
         }
-    }
-
-    private void calculateFibonacci(StringBuilder report) {
-        int n = 10;
-        long fibStart = System.nanoTime();
-        int fibResult = fibonacci(n);
-        long fibElapsed = System.nanoTime() - fibStart;
-        report.append("Fibonacci(" + n + ") = " + fibResult + " [" + (fibElapsed / 1_000_000) + " ms]\n");
-    }
-
-    private int fibonacci(int n) {
-        if (n <= 1) return n;
-        return fibonacci(n - 1) + fibonacci(n - 2);
     }
 
     private void handleUserOperations(StringBuilder report) {
