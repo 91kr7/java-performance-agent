@@ -5,6 +5,7 @@ import com.cmdev.profiler.instrument.io.PerformanceFileWriter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TimerTracingUtils {
@@ -15,7 +16,10 @@ public class TimerTracingUtils {
 
 
     private static final Map<String, AtomicInteger> callDeep = new ConcurrentHashMap<>();
+
+    private final ConcurrentLinkedQueue<String> traceQueue = new ConcurrentLinkedQueue<>();
     private static final Map<String, PerformanceFileWriter> outputBuffer = new ConcurrentHashMap<>();
+
 
     private static String getThreadId() {
         return TimerContext.getTraceId();
@@ -52,12 +56,28 @@ public class TimerTracingUtils {
 
         String threadId = getThreadId();
         if (threadId != null) {
-            PerformanceFileWriter writer = outputBuffer.computeIfAbsent(threadId, id -> new PerformanceFileWriter(OUTPUTDIR + threadId));
-
-            writer.writeLine(buildMessage(threadId, message, isMethodStart));
 
             AtomicInteger depth = callDeep.computeIfAbsent(threadId, id -> new AtomicInteger(0));
-            if (depth.get() == 0) {
+
+            int depthOfTheMessage = -1;
+            if (isMethodStart) {
+                depthOfTheMessage = depth.getAndIncrement();
+            } else {
+                depthOfTheMessage = depth.decrementAndGet();
+                if (depthOfTheMessage < 0) {
+                    depthOfTheMessage = 0;
+                    depth.set(0);
+                }
+            }
+            boolean traceEnded = callDeep.get(threadId).get() == 0;
+            String prefix = isMethodStart ? TRACE_INDENT_ON : TRACE_DELIMITER_OFF;
+            // put the mssage in the queue
+
+            PerformanceFileWriter writer = outputBuffer.computeIfAbsent(threadId, id -> new PerformanceFileWriter(OUTPUTDIR + threadId));
+
+            writer.writeLine(intendMessage(depthOfTheMessage, prefix + message));
+
+            if (traceEnded) {
                 TimerContext.stopTrace();
                 callDeep.remove(threadId);
                 writer.close();
@@ -66,26 +86,7 @@ public class TimerTracingUtils {
         }
     }
 
-    private static String buildMessage(String threadId, String message, boolean isMethodStart) {
-        AtomicInteger depth = callDeep.computeIfAbsent(threadId, id -> new AtomicInteger(0));
-
-        int currentDepth;
-        if (isMethodStart) {
-            currentDepth = depth.getAndIncrement();
-        } else {
-            currentDepth = depth.decrementAndGet();
-            if (currentDepth < 0) {
-                currentDepth = 0;
-                depth.set(0);
-            }
-        }
-
-        String prefix = isMethodStart ? TRACE_INDENT_ON : TRACE_DELIMITER_OFF;
-
-        return printIndented(currentDepth, prefix + message);
-    }
-
-    private static String printIndented(int depth, String message) {
+    private static String intendMessage(int depth, String message) {
         if (depth < 0) {
             depth = 0;
         }
