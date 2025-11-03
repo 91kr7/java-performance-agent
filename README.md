@@ -71,7 +71,7 @@ mvn -q clean install
 rootDir=$PWD
 pushd test-app
 mvn -q clean install
-docker build -t test-app-tomcat -f Dockerfile-Tomcat9jdk17 .
+docker build -t test-app-tomcat -f Dockerfile-Tomcat10jdk17 .
 docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
     -e JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS}" \
     -v $rootDir/test-app/filters.properties:/usr/local/tomcat/filters.properties \
@@ -89,7 +89,7 @@ mvn -q clean install
 rootDir=$PWD
 pushd test-app
 mvn -q clean install
-docker build -t test-app-wildfly -f Dockerfile-Wildfly .
+docker build -t test-app-wildfly -f Dockerfile-Wildfly28jdk17 .
 docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
     -e JAVA_OPTS="${JAVA_TOOL_OPTIONS}" \
     -v $rootDir/test-app/filters.properties:/opt/jboss/wildfly/filters.properties \
@@ -99,7 +99,7 @@ docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
 popd
 ```
 
-### JDK Standard 17
+### JDK 17 
 ```bash
 export MSYS_NO_PATHCONV=1
 JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport -javaagent:/usr/src/app/performance-agent.jar -Dcmdev.profiler.filters.path=/usr/src/app/filters.properties"
@@ -107,13 +107,12 @@ mvn -q clean install
 rootDir=$PWD
 pushd test-app
 mvn -q clean install
-docker build -t test-app-jdk -f Dockerfile-JDK17 .
+docker build -t test-app-jdk -f Dockerfile-jdk17 .
 docker run -p 8090:8090 -p 8787:8787 \
     -e JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS}" \
     -v $rootDir/test-app/filters.properties:/usr/src/app/filters.properties \
     -v $rootDir/target/performance-agent.jar:/usr/src/app/performance-agent.jar \
     -v $rootDir/test-app/traces:/tmp/traces \
-    -v $rootDir/test-app/generated-classes:/tmp/bytebuddy-classes \
     test-app-jdk
 popd
 ```
