@@ -4,9 +4,9 @@ import com.cmdev.profiler.instrument.PerformanceTracer;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.dynamic.ClassFileLocator;
-import net.bytebuddy.matcher.ElementMatchers;
 
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Modifier;
 
 public class AgentStarterImpl implements AgentStarter {
 
@@ -26,8 +26,12 @@ public class AgentStarterImpl implements AgentStarter {
                     .transform((builder, typeDescription, classLoader, module, domain) -> {
                         try {
                             if (isMyApplication(classLoader)) {
-                                return builder.method(ElementMatchers.not(ElementMatchers.isAbstract()))
-                                        .intercept(Advice.to(PerformanceTracer.class, ClassFileLocator.ForClassLoader.of(classLoader)));
+                                return builder.method(methodDescription -> {
+                                    boolean notAbstract = !methodDescription.isAbstract();
+                                    int modifiers = methodDescription.getDeclaringType().getModifiers();
+                                    boolean classVisible = Modifier.isPublic(modifiers);
+                                    return notAbstract && classVisible;
+                                }).intercept(Advice.to(PerformanceTracer.class, ClassFileLocator.ForClassLoader.of(classLoader)));
                             }
                         } catch (Throwable e) {
                             System.err.println("[CMDev] Failed to instrument method!: " + e.getMessage());
