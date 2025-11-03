@@ -4,11 +4,9 @@ public final class ValueVarchar extends ValueStringBase {
 
     /**
      * Empty string. Should not be used in places where empty string can be
-     * treated as {@code NULL} depending on database mode.
-     */
-    public static final ValueVarchar EMPTY = new ValueVarchar("");
+     * treated as {@code NULL} depending on database mode.*/
 
-    private ValueVarchar(String value) {
+    public ValueVarchar(String value) {
         super(value);
     }
 

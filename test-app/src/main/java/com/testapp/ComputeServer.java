@@ -16,7 +16,7 @@ public final class ComputeServer extends BaseComputeServer {
 
     public String run() {
 
-        ValueVarchar.EMPTY.hashCode();
+        new ValueVarchar("").hashCode();
         StringBuilder report = new StringBuilder();
         long start = System.nanoTime();
 
