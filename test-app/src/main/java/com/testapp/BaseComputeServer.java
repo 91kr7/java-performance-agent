@@ -4,7 +4,7 @@ public class BaseComputeServer extends AbstractServer {
 
     @Override
     protected void calculateFibonacci(StringBuilder report) {
-        int n = 10;
+        int n = 25;
         long fibStart = System.nanoTime();
         int fibResult = fibonacci(n);
         long fibElapsed = System.nanoTime() - fibStart;
