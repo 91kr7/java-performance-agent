@@ -27,10 +27,7 @@ public class AgentStarterImpl implements AgentStarter {
                     .transform((builder, typeDescription, classLoader, module, domain) -> {
                         try {
                             if (isMyApplication(classLoader)) {
-                                return builder.method(
-                                                ElementMatchers.isDeclaredBy(typeDescription)
-                                                        .and(ElementMatchers.not(ElementMatchers.isAbstract()))
-                                        )
+                                return builder.method(ElementMatchers.not(ElementMatchers.isAbstract()))
                                         .intercept(Advice.to(PerformanceTracer.class, ClassFileLocator.ForClassLoader.of(classLoader)));
                             }
                         } catch (Throwable e) {

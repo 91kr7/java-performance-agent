@@ -14,6 +14,7 @@ public class ClassFilterUtils {
 
     // Loads filters from an external properties file specified by the system property 'cmdev.profiler.filters.path'.
     private static final Properties FILTERS = new Properties();
+
     static {
         String customPath = System.getProperty("cmdev.profiler.filters.path");
         if (customPath == null || customPath.isEmpty()) {
@@ -44,22 +45,24 @@ public class ClassFilterUtils {
 
     // Checks if a class should be included for instrumentation based on filters.
     public static boolean isIncludedClass(TypeDescription clazz) {
-        if (clazz.isInterface()) {
-            return false;
-        }
-        for (String excludedPackage : EXCLUDED_PACKAGES) {
-            if (clazz.getPackage() != null && clazz.getPackage().getName().contains(excludedPackage)) {
+        if (clazz.isPublic()) {
+            if (clazz.isInterface()) {
                 return false;
             }
-        }
-        for (String excludedClass : EXCLUDED_CLASSES) {
-            if (clazz.getName().toUpperCase().contains(excludedClass)) {
-                return false;
+            for (String excludedPackage : EXCLUDED_PACKAGES) {
+                if (clazz.getPackage() != null && clazz.getPackage().getName().contains(excludedPackage)) {
+                    return false;
+                }
             }
-        }
-        for (String includedPackage : INCLUDED_PACKAGES) {
-            if (clazz.getPackage() != null && clazz.getPackage().getName().contains(includedPackage)) {
-                return true;
+            for (String excludedClass : EXCLUDED_CLASSES) {
+                if (clazz.getName().toUpperCase().contains(excludedClass)) {
+                    return false;
+                }
+            }
+            for (String includedPackage : INCLUDED_PACKAGES) {
+                if (clazz.getPackage() != null && clazz.getPackage().getName().contains(includedPackage)) {
+                    return true;
+                }
             }
         }
         return false;
