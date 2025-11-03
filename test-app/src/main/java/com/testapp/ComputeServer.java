@@ -1,10 +1,15 @@
 package com.testapp;
 
+import com.cmdev.profiler.instrument.TimerContext;
+
 import java.sql.*;
 
 public class ComputeServer {
 
     public static void main(String[] args) throws Exception {
+
+        TimerContext.systemInstrumentationEnabled = true;
+        TimerContext.methodToTrace = "ComputeServer";
         System.out.println(new ComputeServer().run());
     }
 
@@ -43,7 +48,7 @@ public class ComputeServer {
     }
 
     private void calculateFibonacci(StringBuilder report) {
-        int n = 20;
+        int n = 10;
         long fibStart = System.nanoTime();
         int fibResult = fibonacci(n);
         long fibElapsed = System.nanoTime() - fibStart;

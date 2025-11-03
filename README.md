@@ -67,12 +67,10 @@ To run and test the Performance Agent with Tomcat or Wildfly, follow these steps
 ```bash
 export MSYS_NO_PATHCONV=1
 JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport -javaagent:/usr/local/tomcat/performance-agent.jar -Dcmdev.profiler.filters.path=/usr/local/tomcat/filters.properties"
+mvn -q clean install
 rootDir=$PWD
-mkdir -p $rootDir/.m2
-docker run --rm -v $rootDir:/workspace -v $rootDir/.m2:/root/.m2 -w /workspace maven:3.9.6-eclipse-temurin-17 mvn clean install
 pushd test-app
-docker run --rm -v $rootDir:/workspace -v $rootDir/.m2:/root/.m2 -w /workspace/test-app maven:3.9.6-eclipse-temurin-17 mvn clean install
-popd
+mvn -q clean install
 docker build -t test-app-tomcat -f Dockerfile-Tomcat9jdk17 .
 docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
     -e JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS}" \
@@ -80,22 +78,17 @@ docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
     -v $rootDir/target/performance-agent.jar:/usr/local/tomcat/performance-agent.jar \
     -v $rootDir/test-app/traces:/tmp/traces \
     test-app-tomcat
+popd
 ```
 
 ### Wildfly 28.0.0.Final-jdk17
 ```bash
 export MSYS_NO_PATHCONV=1
 JAVA_TOOL_OPTIONS=" -javaagent:/opt/jboss/wildfly/performance-agent.jar  -Dcmdev.profiler.filters.path=/opt/jboss/wildfly/filters.properties"
+mvn -q clean install
 rootDir=$PWD
-# Crea una cartella .m2 locale per la cache Maven
-mkdir -p $rootDir/.m2
-# Build agent (root) usando Maven in un container e condividendo la cache .m2
-
-docker run --rm -v $rootDir:/workspace -v $rootDir/.m2:/root/.m2 -w /workspace maven:3.9.6-eclipse-temurin-17 mvn clean install
-# Build test-app usando Maven in un container e condividendo la cache .m2
 pushd test-app
-docker run --rm -v $rootDir:/workspace -v $rootDir/.m2:/root/.m2 -w /workspace/test-app maven:3.9.6-eclipse-temurin-17 mvn clean install
-popd
+mvn -q clean install
 docker build -t test-app-wildfly -f Dockerfile-Wildfly .
 docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
     -e JAVA_OPTS="${JAVA_TOOL_OPTIONS}" \
@@ -103,4 +96,27 @@ docker run -p 8080:8080 -p 8090:8090 -p 8787:8787 \
     -v $rootDir/target/performance-agent.jar:/opt/jboss/wildfly/performance-agent.jar \
     -v $rootDir/test-app/traces:/tmp/traces \
     test-app-wildfly
+popd
 ```
+
+### JDK Standard 17
+```bash
+export MSYS_NO_PATHCONV=1
+JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport -javaagent:/usr/src/app/performance-agent.jar -Dcmdev.profiler.filters.path=/usr/src/app/filters.properties"
+mvn -q clean install
+rootDir=$PWD
+pushd test-app
+mvn -q clean install
+docker build -t test-app-jdk -f Dockerfile-JDK17 .
+docker run -p 8090:8090 -p 8787:8787 \
+    -e JAVA_TOOL_OPTIONS="${JAVA_TOOL_OPTIONS}" \
+    -v $rootDir/test-app/filters.properties:/usr/src/app/filters.properties \
+    -v $rootDir/target/performance-agent.jar:/usr/src/app/performance-agent.jar \
+    -v $rootDir/test-app/traces:/tmp/traces \
+    -v $rootDir/test-app/generated-classes:/tmp/bytebuddy-classes \
+    test-app-jdk
+popd
+```
+
+## License & Contributions
+Open source project – contributions and feedback are welcome!

@@ -1,0 +1,13 @@
+# Dockerfile per esecuzione JDK standard
+FROM openjdk:17
+
+WORKDIR /usr/src/app
+
+# Copia la directory già decompresso del WAR
+COPY target/test-app-1.0-SNAPSHOT/ /usr/src/app/app/
+
+# Espone le classi e le librerie
+ENV CLASSPATH=/usr/src/app/app/WEB-INF/classes:/usr/src/app/app/WEB-INF/lib/*
+
+# CMD: lancia un main Java se presente (esempio: com.testapp.Main)
+CMD ["java", "com.testapp.ComputeServer"]
