@@ -1,5 +1,5 @@
 # Dockerfile per esecuzione JDK standard
-FROM openjdk:17
+FROM eclipse-temurin:17-jdk
 
 WORKDIR /usr/src/app
 
