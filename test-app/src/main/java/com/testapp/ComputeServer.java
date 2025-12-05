@@ -10,21 +10,23 @@ public final class ComputeServer extends BaseComputeServer {
     public static void main(String[] args) throws Exception {
 
         TimerContext.systemInstrumentationEnabled = true;
-        TimerContext.methodToTrace = "ComputeServer";
+        TimerContext.methodToTrace = "com.testapp.ComputeServer";
         System.out.println(new ComputeServer().run());
     }
 
     public String run() {
 
-        new ValueVarchar("").hashCode();
-        StringBuilder report = new StringBuilder();
         long start = System.nanoTime();
+        StringBuilder report = new StringBuilder();
 
+        calculateFibonacci(report);
+
+        /*new ValueVarchar("").hashCode();
         clearDatabase();
         calculateFibonacci(report);
         handleUserOperations(report);
         buildTreeStructure(report);
-        executeRecursiveTreeQuery(report);
+        executeRecursiveTreeQuery(report);*/
 
         long totalElapsed = System.nanoTime() - start;
         report.append("Total time: " + (totalElapsed / 1_000_000) + " ms\n");

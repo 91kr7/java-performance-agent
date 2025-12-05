@@ -2,78 +2,48 @@ package com.cmdev.profiler.instrument;
 
 import com.cmdev.profiler.instrument.daemon.TraceManagerDaemon;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.UUID;
 
 public class TimerTracingUtils {
 
-    private static final String TRACE_INDENT_ON = "+ ";
-    private static final String TRACE_DELIMITER_OFF = "- ";
-    private static final Map<String, AtomicInteger> callDeep = new ConcurrentHashMap<>();
+    private static final ThreadLocal<String> traceId = new ThreadLocal<>();
+    private static final ThreadLocal<int[]> deepOfTheMessage = ThreadLocal.withInitial(() -> new int[1]);
 
     private TimerTracingUtils() {
-
     }
 
     private static String getThreadId() {
         return TimerContext.getTraceId();
     }
 
-    public static void tryToTrace(String message, boolean isMethodStart) {
-        try {
-            if (TimerContext.systemInstrumentationEnabled
-                    && (TimerContext.isTraceEnabled() || message.contains(TimerContext.methodToTrace))
-                    && !containsExcludedPackage(message, TimerContext.packageToExclude)) {
-                if (!TimerContext.isTraceEnabled()) {
-                    TimerContext.initTrace(message);
-                }
-                trace(message, isMethodStart);
-            }
-
-        } catch (Exception e) {
-            System.err.println("[CMDev] TimerTracingUtils: " + e.getMessage());
+    public static void trace(TraceInfos traceInfos) {
+        String threadIdLocal = traceId.get();
+        if (threadIdLocal == null && TimerContext.methodToTrace.contains(traceInfos.getClazz().getName())) {
+            threadIdLocal = UUID.randomUUID().toString();
+            traceId.set(threadIdLocal);
         }
-    }
 
-    private static boolean containsExcludedPackage(String message, String[] packagesToExclude) {
-        if (packagesToExclude == null) return false;
-        for (String pkg : packagesToExclude) {
-            if (pkg != null && message.contains(pkg)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static void trace(String message, boolean isMethodStart) {
-
-        String threadId = getThreadId();
-        if (threadId != null) {
-
-            AtomicInteger depth = callDeep.computeIfAbsent(threadId, id -> new AtomicInteger(0));
-
-            int depthOfTheMessage;
-            if (isMethodStart) {
-                depthOfTheMessage = depth.getAndIncrement();
+        if (threadIdLocal != null) {
+            int[] depthHolder = deepOfTheMessage.get();
+            long depthValue;
+            if (!traceInfos.isEnd()) {
+                depthValue = depthHolder[0]++;
             } else {
-                depthOfTheMessage = depth.decrementAndGet();
-                if (depthOfTheMessage < 0) {
-                    depthOfTheMessage = 0;
-                    depth.set(0);
+                depthValue = --depthHolder[0];
+                if (depthValue < 0) {
+                    depthValue = 0;
+                    depthHolder[0] = 0;
                 }
             }
-            boolean traceEnded = callDeep.get(threadId).get() == 0;
-            if (traceEnded) {
-                TimerContext.stopTrace();
-                callDeep.remove(threadId);
+
+            if (depthHolder[0] == 0) {
+                traceId.remove();
+                deepOfTheMessage.remove();
             }
-            TraceManagerDaemon.putEntry(
-                    new TraceMessage(threadId,
-                            isMethodStart ? TRACE_INDENT_ON : TRACE_DELIMITER_OFF,
-                            message,
-                            depthOfTheMessage,
-                            traceEnded));
+
+            traceInfos.setThreadId(threadIdLocal);
+            traceInfos.setDeep(depthValue);
+            TraceManagerDaemon.putEntry(traceInfos);
         }
     }
 }

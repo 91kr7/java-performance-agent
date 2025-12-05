@@ -15,6 +15,11 @@
       <artifactId>byte-buddy</artifactId>
       <version>1.17.8</version>
     </dependency>
+    <dependency>
+      <groupId>org.jctools</groupId>
+      <artifactId>jctools-core</artifactId>
+      <version>3.1.0</version>
+    </dependency>
   </dependencies>
 
   <build>

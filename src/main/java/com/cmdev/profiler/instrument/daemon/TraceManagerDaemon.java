@@ -1,20 +1,24 @@
 package com.cmdev.profiler.instrument.daemon;
 
-import com.cmdev.profiler.instrument.TraceMessage;
+import com.cmdev.profiler.instrument.TraceInfos;
 import com.cmdev.profiler.instrument.io.PerformanceFileWriter;
+import org.jctools.queues.MpscArrayQueue;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TraceManagerDaemon extends Thread {
 
+    private static final String METHOD_SEPARATOR = ":";
+    private static final String ID_SEPARATOR = "|";
+    private static final String TIME_SEPARATOR = ">";
+    private static final String TRACE_INDENT_ON = "+ ";
+    private static final String TRACE_DELIMITER_OFF = "- ";
     private static final String OUTPUTDIR = "/tmp/traces/";
-
-    private static final ConcurrentLinkedQueue<TraceMessage> traceQueue = new ConcurrentLinkedQueue<>();
+    private static final MpscArrayQueue<TraceInfos> traceQueue = new MpscArrayQueue<>(131_072); // capacità
     private static final Map<String, PerformanceFileWriter> outputBuffer = new ConcurrentHashMap<>();
 
-    public static void putEntry(TraceMessage trace) {
+    public static void putEntry(TraceInfos trace) {
         traceQueue.offer(trace);
     }
 
@@ -30,7 +34,7 @@ public class TraceManagerDaemon extends Thread {
     public void run() {
 
         while (true) {
-            TraceMessage trace = traceQueue.poll();
+            TraceInfos trace = traceQueue.poll();
             if (trace != null) {
                 processEntry(trace);
             } else {
@@ -44,11 +48,14 @@ public class TraceManagerDaemon extends Thread {
         }
     }
 
-    private void processEntry(TraceMessage trace) {
+    private void processEntry(TraceInfos trace) {
 
         try {
+            String logTrace = trace.getStartTime() + ID_SEPARATOR + trace.getClazz().getName() + METHOD_SEPARATOR + trace.getMethodName();
+            String prefix = trace.isEnd() ? TRACE_DELIMITER_OFF : TRACE_INDENT_ON;
             PerformanceFileWriter writer = outputBuffer.computeIfAbsent(trace.getThreadId(), id -> new PerformanceFileWriter(OUTPUTDIR + trace.getThreadId()));
-            writer.writeLine(intendMessage(trace.getDepthOfTheMessage(), trace.getPrefix() + trace.getMessage()));
+
+            writer.writeLine(intendMessage(trace.getDeep(), prefix + logTrace));
             if (trace.isTraceEnded()) {
                 writer.close();
                 outputBuffer.remove(trace.getThreadId());
