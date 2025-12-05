@@ -11,14 +11,14 @@ public class TraceInfos {
     private int deep;
 
     public TraceInfos(Class<?> clazz, String methodName) {
-        this.startTime = System.nanoTime();
+        this.startTime = System.currentTimeMillis();
         this.clazz = clazz;
         this.methodName = methodName;
     }
 
     public TraceInfos(long startTime, Class<?> clazz, String methodName, boolean isEnd) {
         this.startTime = startTime;
-        this.endTime = System.nanoTime();
+        this.endTime = System.currentTimeMillis();
         this.clazz = clazz;
         this.methodName = methodName;
         this.isEnd = isEnd;
