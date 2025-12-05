@@ -7,7 +7,8 @@ import java.util.UUID;
 public class TimerTracingUtils {
 
     private static final ThreadLocal<String> traceId = new ThreadLocal<>();
-    private static final ThreadLocal<int[]> deepOfTheMessage = ThreadLocal.withInitial(() -> new int[1]);
+    private static final ThreadLocal<long[]> deepOfTheMessage = ThreadLocal.withInitial(() -> new long[1]);
+    private static final ThreadLocal<long[]> traceInfoId = ThreadLocal.withInitial(() -> new long[1]);
 
     private TimerTracingUtils() {
     }
@@ -18,14 +19,16 @@ public class TimerTracingUtils {
 
     public static void trace(TraceInfos traceInfos) {
         String threadIdLocal = traceId.get();
-        if (threadIdLocal == null && TimerContext.methodToTrace.contains(traceInfos.getClazz().getName())) {
+        if (threadIdLocal == null && traceInfos.getClazz() != null && TimerContext.methodToTrace.contains(traceInfos.getClazz().getName())) {
             threadIdLocal = UUID.randomUUID().toString();
             traceId.set(threadIdLocal);
         }
-
         if (threadIdLocal != null) {
-            int[] depthHolder = deepOfTheMessage.get();
-            int depthValue;
+            if (traceInfos.getTraceInfoId() == null) {
+                traceInfos.setTraceInfoId(traceInfoId.get()[0]++);
+            }
+            long[] depthHolder = deepOfTheMessage.get();
+            long depthValue;
             if (!traceInfos.isEnd()) {
                 depthValue = depthHolder[0]++;
             } else {
@@ -36,8 +39,9 @@ public class TimerTracingUtils {
                 }
             }
 
-            if (depthHolder[0] == 0) {
+            if (traceInfos.isEnd() && depthHolder[0] == 0) {
                 traceId.remove();
+                traceInfoId.remove();
                 deepOfTheMessage.remove();
             }
 

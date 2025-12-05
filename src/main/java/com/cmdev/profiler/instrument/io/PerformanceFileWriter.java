@@ -40,4 +40,8 @@ public class PerformanceFileWriter {
             System.err.println("[CMDev] Error zipping file: " + e.getMessage());
         }
     }
+
+    public void flush() throws IOException {
+
+    }
 }
