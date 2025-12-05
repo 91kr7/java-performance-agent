@@ -25,7 +25,7 @@ public class TimerTracingUtils {
 
         if (threadIdLocal != null) {
             int[] depthHolder = deepOfTheMessage.get();
-            long depthValue;
+            int depthValue;
             if (!traceInfos.isEnd()) {
                 depthValue = depthHolder[0]++;
             } else {

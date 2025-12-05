@@ -4,10 +4,11 @@ public class TraceInfos {
 
     private String threadId;
     private long startTime;
+    private long endTime;
     private Class<?> clazz;
     private String methodName;
     private boolean isEnd;
-    private long deep;
+    private int deep;
 
     public TraceInfos(Class<?> clazz, String methodName) {
         this.startTime = System.nanoTime();
@@ -15,8 +16,9 @@ public class TraceInfos {
         this.methodName = methodName;
     }
 
-    public TraceInfos(Class<?> clazz, String methodName, boolean isEnd) {
-        this.startTime = System.nanoTime();
+    public TraceInfos(long startTime, Class<?> clazz, String methodName, boolean isEnd) {
+        this.startTime = startTime;
+        this.endTime = System.nanoTime();
         this.clazz = clazz;
         this.methodName = methodName;
         this.isEnd = isEnd;
@@ -26,7 +28,7 @@ public class TraceInfos {
         this.threadId = threadId;
     }
 
-    public void setDeep(long deep) {
+    public void setDeep(int deep) {
         this.deep = deep;
     }
 
@@ -50,7 +52,11 @@ public class TraceInfos {
         return isEnd;
     }
 
-    public long getDeep() {
+    public int getDeep() {
         return deep;
+    }
+
+    public long getEndTime() {
+        return endTime;
     }
 }

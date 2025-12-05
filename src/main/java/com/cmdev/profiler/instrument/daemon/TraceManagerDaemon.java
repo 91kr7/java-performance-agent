@@ -11,7 +11,7 @@ public class TraceManagerDaemon extends Thread {
 
     private static final String METHOD_SEPARATOR = ":";
     private static final String ID_SEPARATOR = "|";
-    private static final String TIME_SEPARATOR = ">";
+    private static final String END_SEPARATOR = ">";
     private static final String TRACE_INDENT_ON = "+ ";
     private static final String TRACE_DELIMITER_OFF = "- ";
     private static final String OUTPUTDIR = "/tmp/traces/";
@@ -39,7 +39,7 @@ public class TraceManagerDaemon extends Thread {
                 processEntry(trace);
             } else {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100); // Reduced sleep time for better responsiveness
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -51,17 +51,23 @@ public class TraceManagerDaemon extends Thread {
     private void processEntry(TraceInfos trace) {
 
         try {
-            String logTrace = trace.getStartTime() + ID_SEPARATOR + trace.getClazz().getName() + METHOD_SEPARATOR + trace.getMethodName();
-            String prefix = trace.isEnd() ? TRACE_DELIMITER_OFF : TRACE_INDENT_ON;
+            String logTrace;
+
+            // Be Carefull! the startTime of the trace is also the trace ID
+            if (trace.isEnd()) {
+                logTrace = TRACE_DELIMITER_OFF + trace.getStartTime() + END_SEPARATOR + trace.getEndTime();
+            } else {
+                logTrace = TRACE_INDENT_ON + trace.getStartTime() + ID_SEPARATOR + trace.getClazz().getName() + METHOD_SEPARATOR + trace.getMethodName();
+            }
             PerformanceFileWriter writer = outputBuffer.computeIfAbsent(trace.getThreadId(), id -> new PerformanceFileWriter(OUTPUTDIR + trace.getThreadId()));
 
-            writer.writeLine(intendMessage(trace.getDeep(), prefix + logTrace));
-            if (trace.isTraceEnded()) {
+            writer.writeLine(intendMessage(trace.getDeep(), logTrace));
+            if (trace.isEnd()) {
                 writer.close();
                 outputBuffer.remove(trace.getThreadId());
             }
         } catch (Exception e) {
-            System.err.println("[CMDev] Error while processing trace message " + trace.getDepthOfTheMessage() + ": " + e.getMessage());
+            System.err.println("[CMDev] Error while processing trace message " + trace.getDeep() + ": " + e.getMessage());
         }
     }
 }
