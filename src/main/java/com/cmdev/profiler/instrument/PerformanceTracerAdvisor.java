@@ -2,13 +2,13 @@ package com.cmdev.profiler.instrument;
 
 import net.bytebuddy.asm.Advice;
 
-public class PerformanceTracer {
+public class PerformanceTracerAdvisor {
 
     @Advice.OnMethodEnter
     public static Long onEnter(@Advice.Origin Class<?> clazz,
                                @Advice.Origin("#m") String methodName) {
 
-        if (TimerContext.systemInstrumentationEnabled) {
+        if (TracingGlobalStatus.systemInstrumentationEnabled) {
             try {
                 TraceInfos trace = new TraceInfos(clazz, methodName);
                 TimerTracingUtils.trace(trace);
@@ -25,7 +25,7 @@ public class PerformanceTracer {
                               @Advice.Origin("#m") String methodName,
                               @Advice.Enter Long traceInfoId) {
 
-        if (TimerContext.systemInstrumentationEnabled) {
+        if (TracingGlobalStatus.systemInstrumentationEnabled) {
             try {
                 TimerTracingUtils.trace(new TraceInfos(traceInfoId));
             } catch (Throwable e) {

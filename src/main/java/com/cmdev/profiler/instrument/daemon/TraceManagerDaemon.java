@@ -32,7 +32,7 @@ public class TraceManagerDaemon extends Thread {
                 processEntry(trace);
             } else {
                 try {
-                    Thread.sleep(100); // Reduced sleep time for better responsiveness
+                    Thread.sleep(10); // Reduced sleep time for better responsiveness
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -46,7 +46,6 @@ public class TraceManagerDaemon extends Thread {
         try {
             String logTrace;
 
-            // Be Carefull! the startTime of the trace is also the trace ID
             if (!trace.isEnd()) {
                 logTrace = trace.getDeep() + TRACE_INDENT_ON + ID_SEPARATOR + trace.getTraceInfoId() + TIME_SEPARATOR + trace.getTime() + METHOD_SEPARATOR + trace.getClazz().getName() + DOT + trace.getMethodName();
             } else {

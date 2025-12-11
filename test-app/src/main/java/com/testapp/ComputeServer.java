@@ -1,7 +1,6 @@
 package com.testapp;
 
-import com.cmdev.profiler.instrument.TimerContext;
-import org.test.ValueVarchar;
+import com.cmdev.profiler.instrument.TracingGlobalStatus;
 
 import java.sql.*;
 
@@ -9,8 +8,8 @@ public final class ComputeServer extends BaseComputeServer {
 
     public static void main(String[] args) throws Exception {
 
-        TimerContext.systemInstrumentationEnabled = true;
-        TimerContext.methodToTrace = "com.testapp.ComputeServer";
+        TracingGlobalStatus.systemInstrumentationEnabled = true;
+        TracingGlobalStatus.methodToTrace = "com.testapp.ComputeServer";
         System.out.println(new ComputeServer().run());
     }
 

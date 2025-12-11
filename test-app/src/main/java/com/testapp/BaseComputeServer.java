@@ -4,7 +4,7 @@ public class BaseComputeServer extends AbstractServer {
 
     @Override
     protected void calculateFibonacci(StringBuilder report) {
-        int n = 25;
+        int n = 5;
         int numRuns = 1;
         long[] executionTimes = new long[numRuns];
         long totalTime = 0;

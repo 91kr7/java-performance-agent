@@ -1,6 +1,6 @@
 package com.cmdev.profiler.bootstrap;
 
-import com.cmdev.profiler.instrument.PerformanceTracer;
+import com.cmdev.profiler.instrument.PerformanceTracerAdvisor;
 import com.cmdev.profiler.instrument.daemon.TraceManagerDaemon;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
@@ -33,7 +33,7 @@ public class AgentStarterImpl implements AgentStarter {
                                     int modifiers = methodDescription.getDeclaringType().getModifiers();
                                     boolean classVisible = Modifier.isPublic(modifiers);
                                     return notAbstract && classVisible;
-                                }).intercept(Advice.to(PerformanceTracer.class, ClassFileLocator.ForClassLoader.of(classLoader)));
+                                }).intercept(Advice.to(PerformanceTracerAdvisor.class, ClassFileLocator.ForClassLoader.of(classLoader)));
                             }
                         } catch (Throwable e) {
                             System.err.println("[CMDev] Failed to instrument method!: " + e.getMessage());

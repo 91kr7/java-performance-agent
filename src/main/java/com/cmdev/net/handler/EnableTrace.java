@@ -1,6 +1,6 @@
 package com.cmdev.net.handler;
 
-import com.cmdev.profiler.instrument.TimerContext;
+import com.cmdev.profiler.instrument.TracingGlobalStatus;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.cmdev.net.util.QueryStringUtils;
@@ -21,12 +21,12 @@ public class EnableTrace implements HttpHandler {
             }
             Map<String, String> qs = QueryStringUtils.parse(exchange.getRequestURI().getQuery());
             if (qs.containsKey("expression")) {
-                TimerContext.systemInstrumentationEnabled = true;
-                TimerContext.methodToTrace = qs.get("expression");
-                TimerContext.packageToExclude = null;
+                TracingGlobalStatus.systemInstrumentationEnabled = true;
+                TracingGlobalStatus.methodToTrace = qs.get("expression");
+                TracingGlobalStatus.packageToExclude = null;
                 if (qs.containsKey("packagesFilter")) {
                     String packagesFilter = qs.get("packagesFilter");
-                    TimerContext.packageToExclude = packagesFilter != null && packagesFilter.trim().length() > 0 ? packagesFilter.split(",") : null;
+                    TracingGlobalStatus.packageToExclude = packagesFilter != null && packagesFilter.trim().length() > 0 ? packagesFilter.split(",") : null;
                 }
                 exchange.sendResponseHeaders(OK, -1);
             } else {

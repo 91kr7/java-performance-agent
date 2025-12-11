@@ -6,20 +6,16 @@ import java.util.UUID;
 
 public class TimerTracingUtils {
 
-    private static final ThreadLocal<String> traceId = new ThreadLocal<>();
+    private static final ThreadLocal<String> traceId = new ThreadLocal<>(); // ID Of the all trace file
+    private static final ThreadLocal<long[]> traceInfoId = ThreadLocal.withInitial(() -> new long[1]); // ID of The single line of tracing
     private static final ThreadLocal<long[]> deepOfTheMessage = ThreadLocal.withInitial(() -> new long[1]);
-    private static final ThreadLocal<long[]> traceInfoId = ThreadLocal.withInitial(() -> new long[1]);
 
     private TimerTracingUtils() {
     }
 
-    private static String getThreadId() {
-        return TimerContext.getTraceId();
-    }
-
     public static void trace(TraceInfos traceInfos) {
         String threadIdLocal = traceId.get();
-        if (threadIdLocal == null && traceInfos.getClazz() != null && TimerContext.methodToTrace.contains(traceInfos.getClazz().getName())) {
+        if (threadIdLocal == null && traceInfos.getClazz() != null && TracingGlobalStatus.methodToTrace.contains(traceInfos.getClazz().getName())) {
             threadIdLocal = UUID.randomUUID().toString();
             traceId.set(threadIdLocal);
         }

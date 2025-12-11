@@ -1,6 +1,7 @@
 // ===== COSTANTI E CONFIGURAZIONE =====
 const CONFIG = {
     SPINNER_DELAY: 1000,
+    THRESHOLD:  0.000001,
     LOCAL_HOST: 'http://127.0.0.1:8090',
     SELECTORS: {
         SPINNER: 'loadingSpinner',
@@ -147,13 +148,17 @@ const TraceProcessor = {
         stack.push({node: root, level: -1});
 
         const parseLine = (line) => {
-            const match = line.match(/\+ (.*)\|(.*)>(.*)$/);
+            const match = line.match(/(.*)\@(.*)\|(.*)\:(.*)\>(.*)$/);
             if (!match) return null;
-            const spaces = line.split('+ ')[0].length;
+            const method = match[4];
+            const timeStart = match[3];
+            const timeEnd = match[5];
+            const spaces = match[1].length;
+            const time = (Number(timeEnd) - Number(timeStart)) / 1000000000;
             return {
                 level: spaces / 2,
-                method: match[2].trim(),
-                time: match[3]
+                method: method,
+                time: time
             };
         };
 
@@ -186,26 +191,33 @@ const TraceProcessor = {
         const traceLines = traceInput.split('\n');
 
         // Elabora le linee
-        for (const line of traceLines) {
+        for (let line of traceLines) {
             if (!line) continue;
-
-            if (line.includes('- ')) {
-                const [prefix, timing] = line.split('>');
-                timingForLines[prefix.replace('-', '+')] = timing;
+            if(line.includes('+')) {
+              let splittedLine = line.split('+');
+              line = "\t".repeat(splittedLine[0]) + splittedLine[1];
+              startMethodLines.push(line);
             } else {
-                startMethodLines.push(line);
+              let splittedLine = line.split('-');
+              line = "\t".repeat(splittedLine[0]) + splittedLine[1];
+              const [prefix, timing] = line.split('|');
+              timingForLines[prefix] = timing;
             }
         }
         return {timingForLines, startMethodLines};
+    },
+
+    getTraceId(startLine) {
+        return startLine.split('|')[0];
     },
 
     parseInputToTree(timingForLines, startMethodLines) {
 
         // Crea output con timing
         const outputLines = startMethodLines
-            .filter(line => (Number(timingForLines[line]) / 1000000000) > 0.001)
+            .filter(line => (Number(timingForLines[this.getTraceId(line)]) / 1000000000) > CONFIG.THRESHOLD)
             .map(line =>
-                `${line}>${Number(timingForLines[line]) / 1000000000}`
+                `${line}>${Number(timingForLines[this.getTraceId(line)])}`
             );
 
         return this.parseToJSON(outputLines);
@@ -467,7 +479,7 @@ const TraceActions = {
     convertAndRender(trace) {
         let {timingForLines, startMethodLines} = TraceProcessor.getCallAndEndOfMethods(trace);
         UIRenderer.renderStackedView(timingForLines, startMethodLines);
-        UIRenderer.renderTopMethodByCall(timingForLines, startMethodLines);
+        //UIRenderer.renderTopMethodByCall(timingForLines, startMethodLines);
     }
 };
 
