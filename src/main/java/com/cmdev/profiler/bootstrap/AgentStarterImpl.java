@@ -11,11 +11,13 @@ import java.lang.reflect.Modifier;
 
 public class AgentStarterImpl implements AgentStarter {
 
+    public static final String INSTRUMENTATION_KEY = "cmdev.profiler.instrumentation";
+
     private final Instrumentation instrumentation;
 
-    public AgentStarterImpl(
-            Instrumentation instrumentation) {
+    public AgentStarterImpl(Instrumentation instrumentation) {
         this.instrumentation = instrumentation;
+        System.getProperties().put(INSTRUMENTATION_KEY, instrumentation);
     }
 
     @Override
