@@ -224,7 +224,11 @@ const TraceProcessor = {
         const methodsByCall = {};
 
         for (const line of startMethodLines) {
-            const timeOfExecution = Number(timingForLines[line]) / 1000000000;
+            const splittedLine = line.split('|');
+            const id = splittedLine[0];
+            const startTime = Number(splittedLine[1].split(':')[0]);
+            const endTime = Number(timingForLines[id]);
+            const timeOfExecution = (endTime - startTime) / 1000000000;
             const methodKey = line.split('|')[1];
 
             if (!(methodKey in methodsByCall)) {
@@ -475,7 +479,7 @@ const TraceActions = {
     convertAndRender(trace) {
         let {timingForLines, startMethodLines} = TraceProcessor.getCallAndEndOfMethods(trace);
         UIRenderer.renderStackedView(timingForLines, startMethodLines);
-        //UIRenderer.renderTopMethodByCall(timingForLines, startMethodLines);
+        UIRenderer.renderTopMethodByCall(timingForLines, startMethodLines);
     }
 };
 
