@@ -26,7 +26,17 @@ public class EnableTrace implements HttpHandler {
                 TracingGlobalStatus.packageToExclude = null;
                 if (qs.containsKey("packagesFilter")) {
                     String packagesFilter = qs.get("packagesFilter");
-                    TracingGlobalStatus.packageToExclude = packagesFilter != null && packagesFilter.trim().length() > 0 ? packagesFilter.split(",") : null;
+                    if (packagesFilter != null && !packagesFilter.trim().isEmpty()) {
+                        java.util.Set<String> packageSet = new java.util.HashSet<>();
+                        for (String pkg : packagesFilter.split(",")) {
+                            if (!pkg.trim().isEmpty()) {
+                                packageSet.add(pkg.trim());
+                            }
+                        }
+                        TracingGlobalStatus.packageToExclude = packageSet;
+                    } else {
+                        TracingGlobalStatus.packageToExclude = null;
+                    }
                 }
                 exchange.sendResponseHeaders(OK, -1);
             } else {

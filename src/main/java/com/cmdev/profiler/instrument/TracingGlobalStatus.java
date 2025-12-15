@@ -4,6 +4,6 @@ public class TracingGlobalStatus {
 
     public static boolean systemInstrumentationEnabled = false;
     public static String methodToTrace = null;
-    public static String[] packageToExclude = null;
+    public static java.util.Set<String> packageToExclude = null;
 
 }

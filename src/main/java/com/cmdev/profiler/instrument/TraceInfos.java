@@ -16,8 +16,9 @@ public class TraceInfos {
         this.methodName = methodName;
     }
 
-    public TraceInfos(Long traceInfoId) {
+    public TraceInfos(Long traceInfoId, Class<?> clazz) {
         this.traceInfoId = traceInfoId;
+        this.clazz = clazz;
         this.time = System.nanoTime();
         this.isEnd = true;
     }

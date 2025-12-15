@@ -22,12 +22,11 @@ public class PerformanceTracerAdvisor {
 
     @Advice.OnMethodExit(onThrowable = Throwable.class)
     public static void onExit(@Advice.Origin Class<?> clazz,
-                              @Advice.Origin("#m") String methodName,
                               @Advice.Enter Long traceInfoId) {
 
         if (TracingGlobalStatus.systemInstrumentationEnabled) {
             try {
-                TimerTracingUtils.trace(new TraceInfos(traceInfoId));
+                TimerTracingUtils.trace(new TraceInfos(traceInfoId, clazz));
             } catch (Throwable e) {
                 System.err.println("[CMDev] " + clazz.getSimpleName() + ": " + e.getMessage());
             }
