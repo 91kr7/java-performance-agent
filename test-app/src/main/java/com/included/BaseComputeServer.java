@@ -1,10 +1,10 @@
-package com.testapp;
+package com.included;
 
 public class BaseComputeServer extends AbstractServer {
 
     @Override
-    protected void calculateFibonacci(StringBuilder report) {
-        int n = 5;
+    public void calculateFibonacci(StringBuilder report) {
+        int n = 10;
         int numRuns = 1;
         long[] executionTimes = new long[numRuns];
         long totalTime = 0;

@@ -1,6 +1,7 @@
-package com.testapp;
+package com.included;
 
 import com.cmdev.profiler.instrument.TracingGlobalStatus;
+import com.excluded.testapp.ExcludedClass;
 
 import java.sql.*;
 
@@ -18,7 +19,7 @@ public final class ComputeServer extends BaseComputeServer {
         long start = System.nanoTime();
         StringBuilder report = new StringBuilder();
 
-        calculateFibonacci(report);
+        new ExcludedClass().calculateFibonacci(this, report);
 
         /*new ValueVarchar("").hashCode();
         clearDatabase();
