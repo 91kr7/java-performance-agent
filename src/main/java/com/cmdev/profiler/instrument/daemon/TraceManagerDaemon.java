@@ -49,21 +49,22 @@ public class TraceManagerDaemon extends Thread {
     private void processEntry(TraceInfos trace) {
 
         try {
-            String logTrace;
+            if (!(TracingGlobalStatus.packageToExclude != null && TracingGlobalStatus.packageToExclude.contains(trace.getClazz().getPackage().getName()))) {
+                String logTrace;
+                if (!trace.isEnd()) {
+                    logTrace = trace.getDeep() + TRACE_INDENT_ON + ID_SEPARATOR + trace.getTraceInfoId() + TIME_SEPARATOR + trace.getTime() + METHOD_SEPARATOR + trace.getClazz().getName() + DOT + trace.getMethodName();
+                } else {
+                    logTrace = trace.getDeep() + TRACE_DELIMITER_OFF + ID_SEPARATOR + trace.getTraceInfoId() + TIME_SEPARATOR + trace.getTime();
+                }
+                PerformanceFileWriter writer = outputBuffer.computeIfAbsent(trace.getThreadId(), id -> new PerformanceFileWriter(OUTPUTDIR + trace.getThreadId()));
 
-            if (!trace.isEnd()) {
-                logTrace = trace.getDeep() + TRACE_INDENT_ON + ID_SEPARATOR + trace.getTraceInfoId() + TIME_SEPARATOR + trace.getTime() + METHOD_SEPARATOR + trace.getClazz().getName() + DOT + trace.getMethodName();
-            } else {
-                logTrace = trace.getDeep() + TRACE_DELIMITER_OFF + ID_SEPARATOR + trace.getTraceInfoId() + TIME_SEPARATOR + trace.getTime();
-            }
-            PerformanceFileWriter writer = outputBuffer.computeIfAbsent(trace.getThreadId(), id -> new PerformanceFileWriter(OUTPUTDIR + trace.getThreadId()));
-
-            writer.writeLine(logTrace);
-            if (trace.isEnd()) {
-                writer.flush();
-                if (trace.getDeep() == 0) {
-                    writer.close();
-                    outputBuffer.remove(trace.getThreadId());
+                writer.writeLine(logTrace);
+                if (trace.isEnd()) {
+                    writer.flush();
+                    if (trace.getDeep() == 0) {
+                        writer.close();
+                        outputBuffer.remove(trace.getThreadId());
+                    }
                 }
             }
         } catch (Exception e) {
