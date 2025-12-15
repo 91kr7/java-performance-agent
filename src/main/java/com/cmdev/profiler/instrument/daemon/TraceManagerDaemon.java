@@ -1,6 +1,7 @@
 package com.cmdev.profiler.instrument.daemon;
 
 import com.cmdev.profiler.instrument.TraceInfos;
+import com.cmdev.profiler.instrument.TracingGlobalStatus;
 import com.cmdev.profiler.instrument.io.PerformanceFileWriter;
 import org.jctools.queues.MpscArrayQueue;
 
@@ -32,13 +33,17 @@ public class TraceManagerDaemon extends Thread {
                 processEntry(trace);
             } else {
                 try {
-                    Thread.sleep(10); // Reduced sleep time for better responsiveness
+                    Thread.sleep(getSleepTime());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
                 }
             }
         }
+    }
+
+    private int getSleepTime() {
+        return TracingGlobalStatus.systemInstrumentationEnabled ? 5 : 1000;
     }
 
     private void processEntry(TraceInfos trace) {

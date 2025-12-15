@@ -148,15 +148,15 @@ const TraceProcessor = {
         stack.push({node: root, level: -1});
 
         const parseLine = (line) => {
-            const match = line.match(/(.*)\@(.*)\|(.*)\:(.*)\>(.*)$/);
+            const match = line.match(/(.*)\+(.*)\@(.*)\|(.*)\:(.*)\>(.*)$/);
             if (!match) return null;
-            const method = match[4];
-            const timeStart = match[3];
-            const timeEnd = match[5];
-            const spaces = match[1].length;
+            const method = match[5];
+            const timeStart = match[4];
+            const timeEnd = match[6];
+            const spaces = match[1];
             const time = (Number(timeEnd) - Number(timeStart)) / 1000000000;
             return {
-                level: spaces / 2,
+                level: spaces,
                 method: method,
                 time: time
             };
@@ -194,14 +194,10 @@ const TraceProcessor = {
         for (let line of traceLines) {
             if (!line) continue;
             if(line.includes('+')) {
-              let splittedLine = line.split('+');
-              line = "\t".repeat(splittedLine[0]) + splittedLine[1];
               startMethodLines.push(line);
             } else {
-              let splittedLine = line.split('-');
-              line = "\t".repeat(splittedLine[0]) + splittedLine[1];
               const [prefix, timing] = line.split('|');
-              timingForLines[prefix] = timing;
+              timingForLines[prefix.replace('-', '+')] = timing;
             }
         }
         return {timingForLines, startMethodLines};
