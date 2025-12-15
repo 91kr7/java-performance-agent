@@ -24,9 +24,9 @@ public class ZipUtils {
                     gzos.write(buffer, 0, length);
                 }
             }
-            /*if (!fileToGzip.delete()) {
+            if (!fileToGzip.delete()) {
                 throw new IOException("Unable to delete original file: " + filePath);
-            }*/
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
