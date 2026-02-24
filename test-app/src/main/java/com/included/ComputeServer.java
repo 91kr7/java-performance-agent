@@ -1,7 +1,7 @@
-package com.testapp;
+package com.included;
 
-import com.cmdev.profiler.instrument.TimerContext;
-import org.test.ValueVarchar;
+import com.cmdev.profiler.instrument.TracingGlobalStatus;
+import com.excluded.testapp.ExcludedClass;
 
 import java.sql.*;
 
@@ -9,22 +9,24 @@ public final class ComputeServer extends BaseComputeServer {
 
     public static void main(String[] args) throws Exception {
 
-        TimerContext.systemInstrumentationEnabled = true;
-        TimerContext.methodToTrace = "ComputeServer";
+        TracingGlobalStatus.systemInstrumentationEnabled = true;
+        TracingGlobalStatus.methodToTrace = "com.testapp.ComputeServer";
         System.out.println(new ComputeServer().run());
     }
 
     public String run() {
 
-        new ValueVarchar("").hashCode();
-        StringBuilder report = new StringBuilder();
         long start = System.nanoTime();
+        StringBuilder report = new StringBuilder();
 
+        new ExcludedClass().calculateFibonacci(this, report);
+
+        /*new ValueVarchar("").hashCode();
         clearDatabase();
         calculateFibonacci(report);
         handleUserOperations(report);
         buildTreeStructure(report);
-        executeRecursiveTreeQuery(report);
+        executeRecursiveTreeQuery(report);*/
 
         long totalElapsed = System.nanoTime() - start;
         report.append("Total time: " + (totalElapsed / 1_000_000) + " ms\n");

@@ -66,7 +66,7 @@ To run and test the Performance Agent with Tomcat or Wildfly, follow these steps
 ### Tomcat 10.0 jdk17
 ```bash
 export MSYS_NO_PATHCONV=1
-JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport -javaagent:/usr/local/tomcat/performance-agent.jar -Dcmdev.profiler.filters.path=/usr/local/tomcat/filters.properties"
+JAVA_TOOL_OPTIONS=" -agentlib:jdwp=transport=dt_socket,server=y,address=*:8787,suspend=n -XX:-UseContainerSupport -javaagent:/usr/local/tomcat/performance-agent.jar -Dcmdev.profiler.filters.path=/usr/local/tomcat/filters.properties"
 mvn -q clean install
 rootDir=$PWD
 pushd test-app

@@ -29,7 +29,7 @@ public class DeleteTrace implements HttpHandler {
                 File[] files = directory.listFiles();
                 if (files != null) {
                     java.util.Arrays.stream(files)
-                        .filter(f -> f.isFile() && f.getName().contains(traceId + "|"))
+                        .filter(f -> f.isFile() && f.getName().contains(traceId))
                         .forEach(File::delete);
                 }
             }

@@ -1,6 +1,6 @@
 package com.cmdev.net.handler;
 
-import com.cmdev.profiler.instrument.TimerContext;
+import com.cmdev.profiler.instrument.TracingGlobalStatus;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -23,9 +23,9 @@ public class GetTraceInfo implements HttpHandler {
             Headers headers = exchange.getResponseHeaders();
             headers.set(CONTENT_TYPE, "application/json");
 
-            byte[] bytes = ("{\"enabled\": " + TimerContext.systemInstrumentationEnabled
-                    + ", \"packagesFilter\": \"" + (TimerContext.packageToExclude != null ? String.join(",", TimerContext.packageToExclude) : "") + "\""
-                    + ", \"expression\": \"" + (TimerContext.methodToTrace != null ? TimerContext.methodToTrace : "") + "\"}")
+            byte[] bytes = ("{\"enabled\": " + TracingGlobalStatus.systemInstrumentationEnabled
+                    + ", \"packagesFilter\": \"" + (TracingGlobalStatus.packageToExclude != null ? String.join(",", TracingGlobalStatus.packageToExclude) : "") + "\""
+                    + ", \"expression\": \"" + (TracingGlobalStatus.methodToTrace != null ? TracingGlobalStatus.methodToTrace : "") + "\"}")
                     .getBytes(StandardCharsets.UTF_8);
 
             exchange.sendResponseHeaders(OK, bytes.length);
