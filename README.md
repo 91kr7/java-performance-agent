@@ -49,11 +49,11 @@ By using these images, you accept the terms of their respective licenses.
 5. **Analysis**: Collected traces are available for download and analysis, helping to pinpoint performance issues.
 
 ## Example REST Endpoints
-- `GET /traces` – List available traces
-- `POST /trace/start` – Start a new trace
-- `POST /trace/stop` – Stop the current trace
-- `GET /trace/{id}` – Download a trace file
-- `DELETE /trace/{id}` – Delete a trace
+- `GET /api/traces` – List available traces
+- `POST /api/trace/start` – Start a new trace
+- `POST /api/trace/stop` – Stop the current trace
+- `GET /api/trace/{id}` – Download a trace file
+- `POST /api/trace/delete/{id}` – Delete a trace
 
 ## Quick Start
 1. Build the agent and your target application.
