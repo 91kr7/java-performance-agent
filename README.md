@@ -15,6 +15,8 @@ Enables real-time performance monitoring and tracing for Java applications, help
 - **Handlers (GetTrace, GetTraces, DeleteTrace, StopTrace, etc.)**: REST endpoints for trace operations (start, stop, list, download, delete).
 - **StaticResourceHandler**: Serves the web UI (HTML, CSS, JS) for interactive trace exploration.
 - **File Writers & Utilities**: Serialize, compress, and store trace data efficiently.
+- **ObjectSizeCalculator**: Computes the memory footprint (deep size) of Java objects using `Instrumentation` and `Unsafe`.
+- **TraceManagerDaemon**: A daemon thread that processes trace entries from a high-performance queue (`MpscArrayQueue`) and writes them to disk asynchronously.
 
 ## Requirements
 - Java 17+ (compatible with modern JVMs)
@@ -22,15 +24,15 @@ Enables real-time performance monitoring and tracing for Java applications, help
 - No code changes required in the target application
 
 ## Third-party Libraries & Docker Images
-This project uses [ByteBuddy](https://bytebuddy.net/) for runtime instrumentation of Java classes and methods.
-- ByteBuddy is licensed under the Apache License, Version 2.0. [License](https://www.apache.org/licenses/LICENSE-2.0)
-- By using ByteBuddy, this project complies with the terms of the Apache License 2.0, including attribution and license notice.
+This project uses the following libraries:
+- [ByteBuddy](https://bytebuddy.net/) (Apache License 2.0) - For runtime instrumentation of Java classes and methods.
+- [JCTools](https://jctools.github.io/JCTools/) (Apache License 2.0) - Provides high-performance concurrent queues (`MpscArrayQueue`) for efficient trace data processing.
 
 This project uses official Docker images for:
-- [Apache Tomcat](https://hub.docker.com/_/tomcat) (Apache License 2.0) [License](https://www.apache.org/licenses/LICENSE-2.0)
-- [Wildfly](https://hub.docker.com/r/jboss/wildfly) (LGPL v2.1) [License](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html)
+- [Apache Tomcat](https://hub.docker.com/_/tomcat) (Apache License 2.0)
+- [Wildfly](https://hub.docker.com/r/jboss/wildfly) (LGPL v2.1)
 
-By using these images, you accept the terms of their respective licenses.
+By using these libraries and images, you accept the terms of their respective licenses.
 
 ## Usage & Integration
 - **Attach to JVM**: Add the agent JAR to your JVM startup parameters:
