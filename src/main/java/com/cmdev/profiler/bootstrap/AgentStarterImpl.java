@@ -2,6 +2,7 @@ package com.cmdev.profiler.bootstrap;
 
 import com.cmdev.profiler.instrument.PerformanceTracerAdvisor;
 import com.cmdev.profiler.instrument.daemon.TraceManagerDaemon;
+import com.cmdev.profiler.memory.ObjectSizeCalculator;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.dynamic.ClassFileLocator;
@@ -11,13 +12,11 @@ import java.lang.reflect.Modifier;
 
 public class AgentStarterImpl implements AgentStarter {
 
-    public static final String INSTRUMENTATION_KEY = "cmdev.profiler.instrumentation";
-
-    private final Instrumentation instrumentation;
+    private static Instrumentation instrumentation = null;
 
     public AgentStarterImpl(Instrumentation instrumentation) {
         this.instrumentation = instrumentation;
-        System.getProperties().put(INSTRUMENTATION_KEY, instrumentation);
+        ObjectSizeCalculator.premain(instrumentation);
     }
 
     @Override

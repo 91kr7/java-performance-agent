@@ -5,6 +5,9 @@ import com.cmdev.profiler.instrument.TracingGlobalStatus;
 import com.cmdev.profiler.instrument.io.PerformanceFileWriter;
 import org.jctools.queues.MpscArrayQueue;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,6 +30,12 @@ public class TraceManagerDaemon extends Thread {
     @Override
     public void run() {
 
+        try {
+            Files.createDirectory(Paths.get(OUTPUTDIR));
+            System.out.println("[CMDev] Trace dir created!");
+        } catch (IOException e) {
+            System.out.println("[CMDev] Trace dir already exists!");
+        }
         while (true) {
             TraceInfos trace = traceQueue.poll();
             if (trace != null) {
